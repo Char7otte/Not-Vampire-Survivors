@@ -1,9 +1,14 @@
 extends CanvasLayer
 
+@onready var continue_button = %ContinueButton
+@onready var quit_button = %QuitButton
 @onready var panel_container = $%PanelContainer
 
 
 func _ready():
+	continue_button.pressed.connect(on_continue_button_pressed)
+	quit_button.pressed.connect(on_quit_button_pressed)
+	
 	panel_container.pivot_offset = panel_container.size / 2
 	
 	var tween = create_tween()
@@ -20,13 +25,16 @@ func set_defeat():
 	
 	play_jingle(true)
 
-func _on_restart_button_pressed():
+func on_continue_button_pressed():
+	get_tree().change_scene_to_file("res://scenes/ui/meta_menu.tscn")
+	await ScreenTransition.transitioned_halfway
 	get_tree().paused = false
-	get_tree().change_scene_to_file("res://scenes/main/main.tscn")
 
 
-func _on_quit_button_pressed():
-	get_tree().quit()
+func on_quit_button_pressed():
+	ScreenTransition.transition_to_scene("res://scenes/ui/main_menu.tscn")
+	await ScreenTransition.transitioned_halfway
+	get_tree().paused = false
 
 
 func play_jingle(defeat: bool = false):
