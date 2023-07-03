@@ -1,0 +1,142 @@
+[gd_scene load_steps=22 format=3 uid="uid://wkrvuwsemmuu"]
+
+[ext_resource type="Script" path="res://scenes/game_object/basic_enemy/basic_enemy.gd" id="1_jml6p"]
+[ext_resource type="Texture2D" uid="uid://d21nt4nqbcjio" path="res://scenes/game_object/basic_enemy/basic_enemy.png" id="1_rfoh0"]
+[ext_resource type="PackedScene" uid="uid://0q0sbalojj02" path="res://scenes/component/health_component.tscn" id="2_nrmf8"]
+[ext_resource type="PackedScene" uid="uid://c2lmpi7bgkubk" path="res://scenes/component/vial_drop_component.tscn" id="3_6wn7y"]
+[ext_resource type="PackedScene" uid="uid://d2vkorsq3g7nc" path="res://scenes/component/hurtbox_component.tscn" id="4_1bl47"]
+[ext_resource type="PackedScene" uid="uid://ckis5xwgtnc0d" path="res://scenes/component/velocity_component.tscn" id="4_n0e3x"]
+[ext_resource type="PackedScene" uid="uid://bf7dvhhdvtrn8" path="res://scenes/component/death_component.tscn" id="4_v5hju"]
+[ext_resource type="Shader" path="res://scenes/component/hit_flash_component.gdshader" id="6_nb4uv"]
+[ext_resource type="PackedScene" uid="uid://byxim4tbtavwo" path="res://scenes/component/hit_flash_component.tscn" id="7_05ewt"]
+[ext_resource type="AudioStream" uid="uid://8vlymsov16bs" path="res://assets/audio/footstep_carpet_000.ogg" id="10_iqw7d"]
+[ext_resource type="PackedScene" uid="uid://ym7j3mqf0jh7" path="res://scenes/component/random_stream_player_2d_component.tscn" id="10_jeayg"]
+[ext_resource type="AudioStream" uid="uid://mg36qwba2ele" path="res://assets/audio/footstep_carpet_001.ogg" id="12_v4xyg"]
+[ext_resource type="AudioStream" uid="uid://cmler6svqhhyo" path="res://assets/audio/footstep_carpet_002.ogg" id="13_ptmlp"]
+[ext_resource type="AudioStream" uid="uid://b6d6fh20pa106" path="res://assets/audio/footstep_carpet_003.ogg" id="14_81jtg"]
+[ext_resource type="AudioStream" uid="uid://bktwnqq1720tb" path="res://assets/audio/footstep_carpet_004.ogg" id="15_62i45"]
+
+[sub_resource type="Animation" id="Animation_1n1fh"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Visuals/Sprite2D:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(0, 0)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Visuals/Sprite2D:rotation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.0]
+}
+
+[sub_resource type="Animation" id="Animation_jtesk"]
+resource_name = "walk"
+length = 0.4
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Visuals/Sprite2D:position")
+tracks/0/interp = 2
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.3),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector2(0, 0), Vector2(-1, 0), Vector2(-1, 0)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Visuals/Sprite2D:rotation")
+tracks/1/interp = 2
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.2, 0.3),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 0,
+"values": [0.174533, -0.174533, 0.174533, -0.174533]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_ftajy"]
+_data = {
+"RESET": SubResource("Animation_1n1fh"),
+"walk": SubResource("Animation_jtesk")
+}
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_2esaa"]
+resource_local_to_scene = true
+shader = ExtResource("6_nb4uv")
+shader_parameter/lerp_percent = 0.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_em0kq"]
+radius = 12.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_24xne"]
+radius = 5.0
+
+[node name="BasicEnemy" type="CharacterBody2D" groups=["enemy"]]
+collision_layer = 8
+collision_mask = 9
+motion_mode = 1
+script = ExtResource("1_jml6p")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+autoplay = "walk"
+libraries = {
+"": SubResource("AnimationLibrary_ftajy")
+}
+
+[node name="HealthComponent" parent="." instance=ExtResource("2_nrmf8")]
+
+[node name="VialDropComponent" parent="." node_paths=PackedStringArray("health_component") instance=ExtResource("3_6wn7y")]
+drop_percent = 0.35
+health_component = NodePath("../HealthComponent")
+
+[node name="VelocityComponent" parent="." instance=ExtResource("4_n0e3x")]
+
+[node name="HitFlashComponent" parent="." node_paths=PackedStringArray("health_component", "sprite") instance=ExtResource("7_05ewt")]
+health_component = NodePath("../HealthComponent")
+sprite = NodePath("../Visuals/Sprite2D")
+hit_flash_material = SubResource("ShaderMaterial_2esaa")
+
+[node name="DeathComponent" parent="." node_paths=PackedStringArray("health_component", "sprite") instance=ExtResource("4_v5hju")]
+health_component = NodePath("../HealthComponent")
+sprite = NodePath("../Visuals/Sprite2D")
+
+[node name="HitRandomAudioPlayerComponent" parent="." instance=ExtResource("10_jeayg")]
+max_distance = 300.0
+streams = Array[AudioStream]([ExtResource("10_iqw7d"), ExtResource("12_v4xyg"), ExtResource("13_ptmlp"), ExtResource("14_81jtg"), ExtResource("15_62i45")])
+
+[node name="HurtBoxComponent" parent="." node_paths=PackedStringArray("health_component") instance=ExtResource("4_1bl47")]
+health_component = NodePath("../HealthComponent")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HurtBoxComponent"]
+position = Vector2(0, -5)
+shape = SubResource("CircleShape2D_em0kq")
+
+[node name="Visuals" type="Node2D" parent="."]
+
+[node name="Sprite2D" type="Sprite2D" parent="Visuals"]
+texture = ExtResource("1_rfoh0")
+offset = Vector2(0, -4)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, -5)
+shape = SubResource("CircleShape2D_24xne")
+
+[connection signal="hit" from="HurtBoxComponent" to="." method="_on_hurt_box_component_hit"]

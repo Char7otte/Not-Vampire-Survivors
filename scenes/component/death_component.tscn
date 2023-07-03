@@ -1,0 +1,113 @@
+[gd_scene load_steps=17 format=3 uid="uid://bf7dvhhdvtrn8"]
+
+[ext_resource type="Script" path="res://scenes/component/death_component.gd" id="1_2fm1i"]
+[ext_resource type="Texture2D" uid="uid://d21nt4nqbcjio" path="res://scenes/game_object/basic_enemy/basic_enemy.png" id="1_6m65j"]
+[ext_resource type="PackedScene" uid="uid://ym7j3mqf0jh7" path="res://scenes/component/random_stream_player_2d_component.tscn" id="3_e1k7a"]
+[ext_resource type="AudioStream" uid="uid://8vlymsov16bs" path="res://assets/audio/footstep_carpet_000.ogg" id="4_a4231"]
+[ext_resource type="AudioStream" uid="uid://mg36qwba2ele" path="res://assets/audio/footstep_carpet_001.ogg" id="5_wxmbs"]
+[ext_resource type="AudioStream" uid="uid://cmler6svqhhyo" path="res://assets/audio/footstep_carpet_002.ogg" id="6_nmsnh"]
+[ext_resource type="AudioStream" uid="uid://b6d6fh20pa106" path="res://assets/audio/footstep_carpet_003.ogg" id="7_v7yib"]
+[ext_resource type="AudioStream" uid="uid://bktwnqq1720tb" path="res://assets/audio/footstep_carpet_004.ogg" id="8_0p6xp"]
+
+[sub_resource type="Animation" id="Animation_swita"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("GPUParticles2D:emitting")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+
+[sub_resource type="Animation" id="Animation_u073h"]
+resource_name = "default"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("GPUParticles2D:emitting")
+tracks/0/interp = 2
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+tracks/1/type = "method"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath(".")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(1),
+"transitions": PackedFloat32Array(1),
+"values": [{
+"args": [],
+"method": &"queue_free"
+}]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_yi4ra"]
+_data = {
+"RESET": SubResource("Animation_swita"),
+"default": SubResource("Animation_u073h")
+}
+
+[sub_resource type="Gradient" id="Gradient_jkrfe"]
+interpolation_mode = 2
+offsets = PackedFloat32Array(0.010101, 0.868687, 1)
+colors = PackedColorArray(1, 1, 1, 1, 0.382653, 0.382653, 0.382653, 1, 0, 0, 0, 1)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_ie31x"]
+gradient = SubResource("Gradient_jkrfe")
+
+[sub_resource type="Curve" id="Curve_hqjr6"]
+_data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(0.248908, 1), 0.0, 0.0, 0, 0, Vector2(0.497817, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 4
+
+[sub_resource type="CurveTexture" id="CurveTexture_54i32"]
+curve = SubResource("Curve_hqjr6")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_y3tra"]
+lifetime_randomness = 0.05
+particle_flag_disable_z = true
+direction = Vector3(0, -1, 0)
+spread = 30.0
+gravity = Vector3(0, 400, 0)
+initial_velocity_min = 250.0
+initial_velocity_max = 500.0
+angular_velocity_min = -1440.0
+angular_velocity_max = 1440.0
+orbit_velocity_min = 0.0
+orbit_velocity_max = 0.0
+scale_max = 2.0
+scale_curve = SubResource("CurveTexture_54i32")
+color_ramp = SubResource("GradientTexture1D_ie31x")
+
+[node name="DeathComponent" type="Node2D"]
+script = ExtResource("1_2fm1i")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+"": SubResource("AnimationLibrary_yi4ra")
+}
+
+[node name="GPUParticles2D" type="GPUParticles2D" parent="."]
+emitting = false
+amount = 1
+process_material = SubResource("ParticleProcessMaterial_y3tra")
+texture = ExtResource("1_6m65j")
+lifetime = 0.7
+one_shot = true
+fixed_fps = 0
+interpolate = false
+
+[node name="HitRandomAudioPlayerComponent" parent="." instance=ExtResource("3_e1k7a")]
+max_distance = 300.0
+streams = Array[AudioStream]([ExtResource("4_a4231"), ExtResource("5_wxmbs"), ExtResource("6_nmsnh"), ExtResource("7_v7yib"), ExtResource("8_0p6xp")])
