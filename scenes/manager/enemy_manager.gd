@@ -26,9 +26,10 @@ func get_spawn_position():
 	var random_direction = Vector2.RIGHT.rotated(randf_range(0, TAU))
 	for i in 4:
 		spawn_position = player.global_position + (SPAWN_RADIUS * random_direction)
+		var additional_check_offset = random_direction * 20
 		
 		#It draws a line from player.global_position to spawn_position on Collision Mask 1.
-		var query_parameters = PhysicsRayQueryParameters2D.create(player.global_position, spawn_position, 1 << 0)
+		var query_parameters = PhysicsRayQueryParameters2D.create(player.global_position, spawn_position + additional_check_offset, 1 << 0)
 		#Checks whether the line intersected anything. If it doesn't, it returns an empty dictionary.
 		var result = get_tree().root.world_2d.direct_space_state.intersect_ray(query_parameters)
 		
